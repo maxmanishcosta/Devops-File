@@ -1,0 +1,96 @@
+Role-Based Access Control (RBAC)
+================================
+Role-Based Access Control (RBAC) in Kubernetes is a method for regulating access to resources in a Kubernetes cluster based on the roles of individual users or service accounts.
+RBAC helps you define what actions (verbs like get, list, create, delete, etc.) can be performed on specific resources (like pods, services, deployments, etc.) within specific namespaces or across the cluster.
+
+Role: A set of permissions (rules) that are defined within a namespace. Roles are used to grant access to resources within a specific namespace.
+
+RoleBinding: Grants the permissions defined in a Role to a user or service account within a specific namespace.
+
+Authentication (who are you?) and Authorization (what can you do?)
+
+
+Users vs Service Accounts
+==========================
+Before setting up RBAC, it's important to understand the Kubernetes user model. There are two ways to create "users" depending on the type of access that's required:
+
+Users -
+---------
+In Kubernetes, a User represents a human who authenticates to the cluster using an external service. You can use private keys (the default method), a list of usernames and passwords, or an OAuth service such as Google Accounts.
+Users are not managed by Kubernetes; there is no API object for them so you can't create them using Kubectl. You must make changes at the external service provider.
+
+Service Accounts -
+--------------------
+Service Accounts are token values that can be used to grant access to namespaces in your cluster. They're designed for use by applications and system components. Unlike Users, Service Accounts are backed by Kubernetes objects and can be managed using the API.
+
+Assume authentication has been done on the kubernetes cluster by company with user.jack, Let use give permissions to him to cluster only to get, list and watch
+
+Create a namespace in kubernetes
+
+kubectl create ns dev [use if already exits]
+kubectl config set-context --current--namespace-dev
+                       
+First, create a sample serviceaccount here in kubernetes called jack
+                       
+Create a Service account ---> Create a ROLE(give permissions) ---> Role Binding
+                       
+==============================================================================================
+vi serviceaccount.yml
+------------------------
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: jack
+  namespace: dev
+                       
+-- kubectl create -f serviceaccount.yml
+
+------------------------------------------
+Create a role within the dev namespace that allows the user jack to perform certain actions on pods:
+
+vi role.yml
+-------------
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: dev
+  name: dev-pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+
+--kubectl create -f role.yml
+Since pods belong to the core API group, we use apiGroups: [""]
+------------------------------------------------------------------------
+This RoleBinding binds the pod-reader Role to jack user, allowing that user to get, list, and watch pods in the dev namespace.
+
+vi rolebinding.yml
+-------------------
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods
+  namespace: dev
+subjects:
+- kind: User
+  name: jack
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: dev-pod-reader
+  apiGroup: rbac.authorization.k8s.io
+                       
+-- kubectl create -f rolebinding.yml
+
+===================================================
+Verifying Access
+---------------------                       
+To verify that the jack user has the correct permissions, you can impersonate the user using kubectl:
+                       
+-- kubectl auth can-i list pods --namespace=dev --as=jack [answer yes]
+-- kubectl auth can-i create pods --namespace=dev --as=jack [answer no]
+-- kubectl get roles -n dev [List all roles in a namespace:
+--kubectl describe rolebinding read-pods -n dev                       
+
+  

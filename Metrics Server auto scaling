@@ -1,0 +1,69 @@
+Auto-Scaling
+==============
+HPA - Horizontal Pod Autoscaling - Scales the number of pods based on CPU/memory utilization or custom metrics.
+VPA - Vertical Pod Autoscaling - Adjusts the CPU/memory requests/limits of a pod dynamically to improve resource allocation. You'll need to install the VPA components in your Kubernetes cluster, as it is not included by default. 
+Install the VPA Custom Resource Definitions (CRDs) separately
+
+In K8S, an HPA automatically updates a workload resource (such as a Deployment or ReplicaSet) based on demand.
+
+Give the value example 70%, if going more than 70% scale out and less than it will do Scale In
+
+The metric server will do the major role here as it will collects metrics, based on the value scale out and scale in happens
+
+Before scale In, process will wait for few mins to scale in to complete the traffic requests
+this is called COOLING PERIOD
+
+vi auto.yml
+============
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mb-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+        - name: cont1
+          image: reyadocker/mobilebankingrepo:latest
+===========================================================
+
+-- kubectl create -f auto.yml
+-- kubectl get pods
+-- kubectl top pods
+
+Now let's stress the pods
+============================
+-- kubectl autoscale deployment mb-deployment --cpu-percent=20 --min-1 --max=10
+Autoscale deployment called mb-deployment if my cpu is more than 20%, scale out, min 1, max 10
+
+-- kubectl get hpa [This wil show cpu: 1% / 20%, now cpu percent is 1%, it will take time ]
+Now lets stress the pod by installing stress inside pod, lets connect to pod using exec and install stress
+
+-- kubectl get pods
+
+--kubectl exec -it mb-deployment-85856755c5-c6fb7 /bin/bash [go inside the pod]
+--apt update
+--apt install stress
+--stress --cpu 8 --io 4 --vm 2 --vm-bytes 128M --timeout 60s
+ --exit
+===============
+--cpu 8: Launches 8 CPU stressors, each consuming 100% CPU by performing continuous computations.
+--io 4: Initiates 4 I/O stressors, each generating continuous I/O operations to stress the system's disk and filesystem.
+--vm 2: Starts 2 virtual memory stressors, each allocating and deallocating memory repeatedly to test the system's memory management.
+--vm-bytes 128M: Specifies that each virtual memory stressor should allocate 128 megabytes of memory.
+--timeout 60s: Sets the duration of the stress test to 60 seconds, after which all stressors will terminate.
+==================================================
+Open another terminal to watch the live pods
+--kubectl get po --watch [To watch]
+
+

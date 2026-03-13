@@ -1,0 +1,51 @@
+1. First, we need to have a deployment, and then we can autoscale on that deployment/deployment name 
+--------------------------------------
+
+vi auto.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+        - name: cont1
+          image: reyadocker/internetbankingrepo:latest
+--------------------------------------------------------
+-- kubectl create -f auto.yml
+-------------------------------------------------------
+2. Autoscaling through manifest file (automatically)
+
+vi hpa.yml
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ib-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ib-deployment
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 20
+
+

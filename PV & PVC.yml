@@ -1,0 +1,118 @@
+
+PV - Persistent Volume
+====================
+Stateless: if i delete pod data is lost, because data is stored locally on the pod and instance
+-----------
+Stateful: if i delete the pod data is persistent, because we can store the data in external storage like AWS EBS
+----------
+Kubernetes Persistent Volumes (PVs) provide a way to manage durable storage for applications running in a Kubernetes cluster.
+
+Unlike ephemeral storage tied to the lifecycle of a pod, Persistent Volumes exist independently of pods and remain intact even after pods are deleted.
+
+This makes PVs ideal for stateful applications that require persistent storage, such as databases
+
+Persistent meaning permanent
+PVs are independent; they can exists even if no pod is using them
+It is created by an administrator or dynamically created by a storage class
+Once a PV is created, it can be bound to a Persistent Volume Claim (PVC), which is a request for storage by a pod
+When a pod requests storage via PVC, KBS will search for a suitable PV to satisfy the requests
+
+PV is bound to the PVC and the pod can use the storage
+If no suitable PV is found, KBS will either dynamically create a new one (if the storage class support dynamic provisioning) or the PVC will remain unbound
+PV will maintain total storage, PV Is bound to PVC
+Pods will ask PVC, PVC will get from PV
+
+PVC - Persistence Volume Claim
+=================================
+
+TO use PV we need to claim the volume using PVC
+PVC request a PV with your desired specification(size, access, modes & speed etc) from KBS and once a suitable PV is found it will bound to PVC
+After bounding is done to pod you can mount is as a volume
+Once user finished work, the attached PV can be released the underlying PV can be reclaimed and recycled for future
+if you create volume in a cluster, if the cluster is delete, the storage is also deleted. SO use AWS EBS Volumes
+
+First, create an EBS volume in EC2, with 10GB magnetic
+
+-- kubectl delete ns dev [delete the namespace and come to default]
+-- kubectl config set-context --current --namespace=default
+
+
+LAB
+====
+vi pv.yml
+------------
+vi pv.yml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-pv
+spec:
+  capacity:
+    storage: 20G1
+  accessModes:
+    - ReadWriteOnce
+  awsElasticBlockStore:
+    volumeID: vol-0771f0561f66408c9
+    fsType: ext4
+
+--kubectl create -f pv.yml
+--kubectl get pv
+
+=========================
+vi pvc.yml
+
+vi pvc.yml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+
+--kubectl create -f pvc.yml
+
+=====================================
+
+vi deploy.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pvdeploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: centos
+        command:
+        - "/bin/bash"
+        - "-c"
+        - "sleep 10000"
+        volumeMounts:
+        - name: my-pv
+          mountPath: "/tmp/persistent"
+      volumes:
+      - name: my-pv
+        persistentVolumeClaim:
+          claimName: my-pvc
+
+--kubectl create -f deploy.yml
+--kubectl get pods
+--kubectl exec -it nameoft the pod -- /bin/bash
+--cd /tmp/persistent/
+-- touch file{1..10}
+--exit
+
+

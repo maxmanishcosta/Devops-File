@@ -1,0 +1,80 @@
+Resource Quota
+=============
+K8S cluster can be divided into namespaces
+By default, the pods in K8s will run with no limitation of Memory and CPU
+WE need to give the limit for the pod
+can limit the objects that can be created in a namespace and total amount of resources
+IT pod schedular in master will check the worker nodes on cpu and memory and create a pod in it we can set limits to CPU, Memory and storage
+CPU is measrured on Cores and memory on Bytes
+1CPU 1000 milliCPUS
+Requests = how much we want
+Limit = how much max we want
+limits can be given to pod and nodes also
+the default limit is 0
+if you mention request and limit everthing will work fine
+if you dont mention request and mention limit then Request = limit
+if you dont mention request dont mention limit, Request ! limit
+Every pod in the namespace must have CPU limit, no need to mention memory, if you dont mention cpu, pod will take all CPU.
+
+The amount of CPU used by all pods inside namespace must not exceed specified limit
+------------------------------------------------
+--kubectl create ns dev
+--kubectl config set-context --current-namespace=dev
+--kubectl config view [To see which namespace we are using]
+
+vi dev-quota.yml
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: dev-quota
+  namespace: dev
+spec:
+  hard:
+    pods: "5"
+    limits.cpu: "1"
+    limits.memory: 1Gi
+
+--kubectl get quota [to show quota]
+
+--kubectl create -f dev-quota.yml
+--kubectl get quota
+
+NAME            AGE     REQUEST                         LIMIT
+dev-quota       69s     pods: 0/5                       limits.cpu: 0/1, limits.memory: 0/1Gi
+kubectl in that ns
+run pod1 --image=nginx [ This will not work because we need to mention quota for dev namespace, as we can put --cpu and--memory in the command or use a manifest file ]
+
+--------------------------------
+
+vi deploy.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: reyadocker/internetbankingrepo:latest
+        resources:
+          limits:
+            cpu: "1"
+            memory: 512Mi
+                        
+-- kubectl create -f deploy.yml
+-- kubectl get pods [It has created only 1 pod, as we mention replica = 3, this is due to restriction we made for this namespace dev] 
+                     
+In the above manifest file, we are mentioning cpu 1 and memory 512 for each pod, but in name space dev we have restricted to 1cpu and 1GB memory, if you run kubectl create -f deploy.yml, it will
+create only 1 pod because of restriction, if you want all 3 pods put cpu as 0.3 ad 300Mi, it will create all- to do this kubectl delete -f deploy.yml and recreate it.

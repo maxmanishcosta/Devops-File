@@ -1,0 +1,50 @@
+SIDE CAR:
+==============
+
+It creates a helper container to main container.
+main container will have application and helper container will do help for main container.
+
+Adapter Design Pattern:
+------------------------
+standardize the output pattern of the main container.
+
+Ambassador Design Pattern:
+---------------------------
+used to connect containers with the outside world 
+
+Init Container:
+---------------
+It initializes the first work and exits later.
+A sidecar container is a secondary container that runs alongside the main application container within the same Kubernetes Pod. 
+This design pattern allows you to extend or enhance the functionality of the main application without modifying its code. 
+Common use cases include log aggregation, data synchronization, and proxying network traffic.
+
+Example: Log Aggregation with a Sidecar Container
+--------------------------------------------------
+Below is a YAML configuration for a Pod that demonstrates the sidecar pattern. In this example, the main application container writes log data to a shared volume, 
+and the sidecar container serves these logs over HTTP using Nginx.
+
+Vi sidecar.yml
+----------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: log-aggregator-pod
+spec:
+  containers:
+    - name: app-container
+      image: alpine
+      command: ["/bin/sh", "-c"]
+      args: ["while true; do date >> /var/log/app.log; sleep 5; done"]
+      volumeMounts:
+        - name: shared-logs
+          mountPath: /var/log
+    - name: sidecar-container
+      image: nginx
+      volumeMounts:
+        - name: shared-logs
+          mountPath: /usr/share/nginx/html
+  volumes:
+    - name: shared-logs
+      emptyDir: {}
+

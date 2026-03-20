@@ -1,0 +1,72 @@
+PODS SCHEDULING:
+================
+
+In Kubernetes, Node Selector, Node Affinity, Taints, and Tolerations are mechanisms that influence how Pods are scheduled onto Nodes within a cluster.
+
+1. Node Selector
+2. Node Affinity
+3. Taints and Tolerations
+
+Node Selector:
+---------------
+NodeSelector is the simplest form of node selection constraint, allowing Pods to be scheduled only on Nodes with specific labels. By specifying a NodeSelector in a Pod's specification, 
+You can ensure that the Pod runs only on Nodes that match the given label criteria. 
+
+NodeSelector: Use when you have simple, specific constraints for Pod placement based on Node labels
+
+In the below manifest file, we are creating 2 pods and those pods should be scheduled in the ib-node labeled node.
+----------------------------------------------------------------------------------------------------------------------
+
+vi nodeselector.yml
+-------------------
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      nodeSelector:
+        node-name: ib-node
+      containers:
+      - name: cont1
+        image: reyadocker/internetbankingrepo:latest
+
+-- kubectl apply -f nodeselector.yml
+-- kubectl get pods 
+-- kubectl get events
+-- kubectl describe
+-- kubectl delete deploy ib-deployment
+
+-------------------------------------------------------------------
+
+2. Node Affinity: (The Flexible Way)
+-------------------
+
+Node Affinity is a more expressive way to specify rules about the placement of pods relative to nodes' labels. 
+It allows you to specify rules that apply only if certain conditions are met. Same as Node Selector, but this has a flexible way, if matches do it, if not schedule pod on any another node.
+
+Two types
+---------
+1. Preferred during scheduling Ignore during execution (soft rules): good if happens
+2. Required during scheduling Ignore during execution (hard rules). Must happen: Same as NodeSelector
+
+The node affinity syntax supports the following operators: In, NotIn, Exists, DoesNotExist, Gt, Lt, etc.
+
+Preferred:
+-----------
+
+vi preferred.yml.
+
+
+

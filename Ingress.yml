@@ -1,5 +1,5 @@
-INGRESS
-=======
+INGRESS:
+=========
 Ingress is a service to expose an application, but we already have cluster ip, node port and load balancer. Let's see
 
 Ingress helps to expose HTTP and HTTPS routes from outside of the Cluster
@@ -13,14 +13,14 @@ Explain Host-based and Path-based
 Host Based Routing: ex: boom.com, web.boom.com, admin.boom.com
 Path based routing: boom.com/hello, boom.com/admin, Paytm.com/movies, Paytm.com/recharge etc
 
-But services like load balancer, cluster IP, node port, etc doesnot have these features
+But services like load balancer, cluster IP, node port, etc. do not have these features
 A general load balancer routes the traffic based on ports and can't handle URL-based routing
 
 -- kubectl get ing --> shows ingress service, no ingress service
 
-To install Ingress, firstly, we have to install nginx ingress controller:
+To install Ingress, firstly, we have to install the Nginx Ingress Controller:
 command:
-# kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/cloud/deploy.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/cloud/deploy.yaml
 
 -- kubectl get pods
 -- kubectl get deploy
@@ -33,5 +33,160 @@ if required
 kubectl delete svc internetbanking
 kubectl delete svc mobilebanking
 kubectl delete deploy internetbanking
+
+=========================================================
+vi httpd.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpd
+  template:
+    metadata:
+      labels:
+        app: httpd
+    spec:
+      containers:
+      - name: httpd
+        image: httpd
+        ports:
+        - containerPort: 80
+        env:
+        - name: TITLE
+          value: "APACHE APP2"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpd
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: httpd
+
+    =======================================================
+
+vi nginx.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+        env:
+        - name: TITLE
+          value: "NGINX APP1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: nginx
+====================================================
+
+deploy now
+-----------
+
+kubectl create -f httpd.yml
+kubectl create -f nginx.yml
+kubectl get pods
+
+====================================================
+
+vi ingress.yml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: k8s-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /nginx(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: nginx
+            port:
+              number: 80
+      - path: /httpd(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: httpd
+            port:
+              number: 80
+      - path: /(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: nginx
+            port:
+              number: 80 
+---------------------------------------------------------------
+
+-- kubectl create -f ingress.yml
+-- kubectl get ing
+-- kubectl get services-nginx-controller --namespace=ingress-nginx
+
+Allow all traffic in the node security group
+Take the ELB and put in the browser http://elb/nginx and http://elb/httpd
+
+-- kubectl delete services-nginx-controller --namespace=ingress-nginx
+
+--------------------------------------------------------------------------
+
+Key Components:
+================
+
+Annotations:
+
+nginx.ingress.kubernetes.io/ssl-redirect: "false": Disables automatic redirection from HTTP to HTTPS.
+nginx.ingress.kubernetes.io/use-regex: "true": Enables the use of regular expressions in path matching.
+nginx.ingress.kubernetes.io/rewrite-target: /$2: Rewrites the matched URI to the specified target.
+
+Rules:
+----------
+Traffic matching /nginx, optionally followed by a / or end of the string, and any subsequent characters ((.*)), is directed to the nginx service.
+Traffic matching /httpd, following the same pattern, is directed to the httpd service.
+All other traffic (/(.*)) is directed to the nginx service.
+Considerations:
+
+Path Matching:
+----------------
+The pathType: ImplementationSpecific allows the Ingress controller to interpret the path matching rules, including regular expressions. Ensure that your Ingress controller supports this path type and regex patterns.
+
 
 

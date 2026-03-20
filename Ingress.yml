@@ -33,3 +33,5 @@ if required
 kubectl delete svc internetbanking
 kubectl delete svc mobilebanking
 kubectl delete deploy internetbanking
+
+

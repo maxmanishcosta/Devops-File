@@ -1,0 +1,35 @@
+INGRESS
+=======
+Ingress is a service to expose an application, but we already have cluster ip, node port and load balancer. Let's see
+
+Ingress helps to expose HTTP and HTTPS routes from outside of the Cluster
+Ingress supports host-based routing and path-based routing
+Ingress supports load balancing and SSL termination
+It redirects the incoming requests to the right services based on the web URL or path in the address
+Ingress provides an encryption feature and helps to balance the load of the applications
+
+Explain Host-based and Path-based
+----------------------------------
+Host Based Routing: ex: boom.com, web.boom.com, admin.boom.com
+Path based routing: boom.com/hello, boom.com/admin, Paytm.com/movies, Paytm.com/recharge etc
+
+But services like load balancer, cluster IP, node port, etc doesnot have these features
+A general load balancer routes the traffic based on ports and can't handle URL-based routing
+
+-- kubectl get ing --> shows ingress service, no ingress service
+
+To install Ingress, firstly, we have to install nginx ingress controller:
+command:
+# kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/cloud/deploy.yaml
+
+-- kubectl get pods
+-- kubectl get deploy
+-- kubectl get svc
+-- kubectl get ingress
+-- kubectl get service
+
+if required
+------------
+kubectl delete svc internetbanking
+kubectl delete svc mobilebanking
+kubectl delete deploy internetbanking

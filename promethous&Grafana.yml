@@ -1,1 +1,93 @@
 
+What is Observability?
+======================
+Here, we will see the concept of Observability, which is a very important aspect for all DevOps Engineers.
+Observability refers to the software tools and methodologies that help Dev and Ops teams to log, collect, correlate, 
+and analyze massive amounts of performance data from a distributed application and glean real-time
+insights. Observability is crucial for maintaining the reliability and availability of software systems. 
+
+It can be divided into three main components, namely:
+
+1. Monitor
+2. Logs
+3. Alerts
+
+What is Grafana?
+====================
+Grafana was built on the principle that data should be accessible to everyone in your organization, not just the single Ops person.
+By democratizing data, Grafana helps to facilitate a culture where data can easily be used and accessed by the people who need it, helping to break down data silos and empower teams.
+With Grafana, you can take any of your existing data, be it from your Kubernetes cluster, Raspberry Pi, different cloud services, or even Google Sheets, and visualize it however you want, all from a single dashboard.
+
+Grafana = Visualization Purpose
+
+What is Prometheus?
+===================
+Prometheus is an open-source tool for monitoring and alerting systems. It collects and stores metrics over time, and can be used to monitor applications, infrastructure, and more
+
+What is Grafana Loki?
+=====================
+Loki is a horizontally scalable, highly available, multi-tenant log aggregation solution. It's designed to be both affordable and simple to use. Rather than indexing the contents of the logs, 
+It uses a set of labels for each log stream.
+Loki is a simple log aggregation tool
+Prometheus is a metrics monitoring tool.
+Loki's design is inspired by Prometheus, but for logs.
+
+What is Promtail?
+=================
+Promtail is an agent that ships the logs from the application to Loki. In Simple words, Loki acts as a data source and provides logs to Grafana whereas Promtail captures logs from various sources.
+
+Monitoring:
+============
+We need a monitoring server to monitor all servers and their metrics
+There are many like
+Nagio, Kibana, Elk, Jabbics, Grafana, new-relic, Prometheus, Splunk
+
+PROMETHEUS:
+============
+Prometheus is an open-source monitoring system that is especially well-suited for cloud-native environments, like Kubernetes.
+It can monitor the performance of your applications and services.
+It will send an alert to you if there are any issues.
+It has a powerful query language that allows you to analyze the data.
+It pulls the real-time metrics, compresses them, and stores them in a time-series database. Prometheus is a standalone system, 
+but it can also be used in conjunction with other tools like Alertmanager to send alerts based on the data it collects. 
+it can be integration with tools like PagerDuty, Teams, Slack, Emails to send alerts to the appropriate on-call personnel.
+It collects, and it also has a rich set of integrations with other tools and systems.
+
+For example, we can use Prometheus to monitor the health of our Kubernetes cluster, and use its integration with Grafana to visualize the data it collects.
+
+
+SYNOPSIS:
+=========
+
+PROMETEUS:
+------------
+its a free & open-source monitoring tool, it collects metrics of nodes
+it store metrics on a time series database, and we use PromQL language
+We can integrate Prometheus with tools like PagerDuty, Slack, and email to send notifications 
+PORT: 9090
+
+GRAFANA:
+---------
+its a visualization tool used to create a dashboard.
+The datasource is the main component (from where you are getting data). Prometheus will show data, but can't create dashboards
+Dashboards: create, Import
+Prometheus will show data, but cannot create dashboards
+We can integrate Grafana with tools like
+Pagerduty, Slack, and email to send notifications
+PORT: 3000
+username: admin, password: admin
+
+======================================================================================================================================
+
+Launch Amazonlinux2 instance call as Promotheus&Grafana Server, from this server we will create the KBS Cluster and monitor all those.
+
+Setup KOPS cluster first, Amazon Linux 2
+
+vim .bashrc
+ecport PATH=$PATH:/usr/local/bin/
+source .bashrc
+
+vi kops.sh
+
+
+

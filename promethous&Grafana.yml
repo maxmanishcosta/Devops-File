@@ -191,5 +191,21 @@ password = Root123456
 
 Check SG, nodes, and ELB.
 
+Go to Grafana Dashboard --> Add the DataSource--> Select Prometheus and below URL, this URL is http://prometheus-server.prometheus.svc.cluster.local/
+
+https://grafana.com/grafana/dashboards/ --- all dashboard IDs are here
+
+Import Grafana dashboard --> New -> Import --> 6417 --> load --> select Prometheus --> import
+
+New --> Import --> 315 --> load --> select Prometheus --> import
+
+Add 1860 port to monitor Nodes individually
+
+11454 --> pv and pvc
+747 --> pod metrics
+14623-> k8s overview use this
+10907 --> monitor api-server
+
+systemctl start grafana-server.service ---to start the Grafana service or see in the script.
 
 

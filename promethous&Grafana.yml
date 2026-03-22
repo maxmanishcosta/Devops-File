@@ -209,3 +209,4 @@ Add 1860 port to monitor Nodes individually
 systemctl start grafana-server.service ---to start the Grafana service or see in the script.
 
 
+NODEEXPORTER: will help to collect the data from worker nodes.

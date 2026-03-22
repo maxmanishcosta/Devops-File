@@ -127,8 +127,8 @@ In K8S: helm
 It is used to install packages on a cluster
 We can install and deploy applications by using Helm
 It manages k8s resources packages through charts
-chart is a collection of files organized in a directory structure
-chart is a collection of manifest files
+A chart is a collection of files organized in a directory structure
+A chart is a collection of manifest files
 A running instance of a chart with a specific config is called a Release.
 
 Usually in k8s, we use a manifest file to deploy, but here we will convert the manifest to helm chart and deploy.
@@ -144,6 +144,52 @@ helm version
 Install Metric Server:
 ======================
 
+Install Metric Server
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability-1.21+.yaml
+
+Steps to Install Prometheus:
+===========================
+
+First, add repositories
+---------------------------
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add grafana https://grafana.github.io/helm-charts
+
+UPDATE HELM CHART REPOS:
+========================
+helm repo update
+helm repo list
+
+CREATE PROMETHEUS NAMESPACE:
+============================
+kubectl get ns
+kubectl create namespace prometheus
+kubectl get ns
+
+INSTALL PROMETHEUS:
+-------------------
+helm install prometheus prometheus-community/prometheus --namespace prometheus --set alertmanager.persistentVolume.storageClass="gp2" --set server.persistentVolume.storageClass="gp2"
+
+kubectl get pods -n prometheus
+kubectl get all -n prometheus
+
+Create Namespace Grafana:
+=========================
+kubectl create namespace grafana
+
+Install Grafana:
+================
+
+helm install grafana grafana/grafana --namespace grafana --set persistence.storageClassName="gp2" --set persistence.enabled=true --set adminPassword='Root123456' --set service.type=LoadBalancer
+
+kubectl get pods -n grafana
+kubectl get service -n grafana
+
+Copy the Instance-IP and paste it into the browser
+username: admin 
+password = Root123456
+
+Check SG, nodes, and ELB.
 
 
 

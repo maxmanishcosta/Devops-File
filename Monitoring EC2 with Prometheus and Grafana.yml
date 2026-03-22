@@ -1,0 +1,26 @@
+Prometheus and Grafana 
+----------------------
+
+Monitoring EC2 instances with Prometheus and Grafana
+====================================================
+
+Grafana: For visualizing metrics and logs.
+Loki: For aggregating and storing logs.
+Promtail: agent for logs
+Prometheus: For collecting metrics.
+Logstash: For log processing and forwarding.
+
+Launch 3 EC2 instance Amazon Linux 2
+
+Monitoring Server
+Worker-Node1
+Worker-Node2
+
+Prometheus = 9090
+grafana = 3000
+node exporter = 9100
+loki = 3100/metrics
+
+Install Prometheus and Grafana in the main monitoring server.
+==============================================================
+

@@ -210,3 +210,6 @@ systemctl start grafana-server.service ---to start the Grafana service or see in
 
 
 NODEEXPORTER: will help to collect the data from worker nodes.
+Node Exporter is the standard tool used to measure the "health" of your actual hardware or virtual machines.
+Node Exporter gives you deep, granular data about the kernel, disk I/O, network traffic, and even hardware temperatures.
+

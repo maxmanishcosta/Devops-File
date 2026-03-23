@@ -1,0 +1,93 @@
+Terraform:
+==========
+
+History:
+========
+In AWS till now, we have created infrastructure manually, created EC2, ELBs, ASG, 53, RDS, VPC, etc
+If we create infra manually
+
+1. Time-consuming
+2. Mistakes
+3. Tracking
+
+But if you want to repeat these creating infra multiple times? You need to automate the creation of infrastructure
+
+AWS introduced a Service called CloudFormation in 2011. Its a very cool service to automate infrastructure using JSON and YAML.
+
+A person who is very passionate about IT Infrastructure got impressed on the CF and started exploring and wrote a blog
+
+On the way of exploring this CF, this person got a basic doubt/question.
+
+AWS has CloudFormation
+Azure has Azure Resource Manager (ARM)
+Google has Deployment Manager
+
+But do we have any COMMON tool to automate infrastructure for all cloud providers? (Cloud agnostic). So he raised this question in his post in a site called tumblr but no one answered. 
+He waited for many days to get an answer.
+
+And as no one answered, this guy came up with the tool called Terraform. His name is Mitchell Hashimoto, the creator of HashiCorp Terraform.
+
+In July of 2014, Terraform 0.1 was released
+
+Terraform:
+----------
+
+Terraform is an open-source Infrastructure as Code (IaC) tool developed by HashiCorp.
+
+It allows users to define and provision infrastructure resources in a consistent, repeatable manner using a high-level configuration language known as HashiCorp Configuration Language (HCL)
+
+It was a free and open-source tool, but now it is not open-source (check on Google, opentofu is a forked version of Terraform)
+
+Year: 2014
+Developed in: GO lang
+Who: Mitchel Hashimoto
+Owned: Hashicorp
+
+Alternatives:
+--------------
+
+PULUMI
+ANSIBLE  --- is mainly used for configuration management, TF will create infra
+CHEF
+PUPPET
+OPENTOFU
+
+TF VS Ansible
+==============
+
+TF will create infra, and these servers will be orchestrated/configured by Ansible
+
+Terraform Structure:
+-------------------
+
+Mainly, most of the people use 3 files in Terraform
+
+main.tf: contains all providers, resources, and data sources
+variables.tf: contains all defined variables
+output.tf: contains all output resources
+
+The issue with this structure is that most logic is stored in the single main.tf file, which therefore becomes pretty complex and long.
+
+Terraform, however, does not mandate this structure; it only requires a directory of Terraform files.
+Filenames do not matter to Terraform. To make it simple, we prefer the following structure.
+
+
+projectname/
+    | -- provider.tf Plugin to connect to Cloud, search in google, TF providers--> AWS--> Use provider
+    | -- version.tf Sets required Terraform and provider versions.
+    | -- backend.tf this file is used to configure the backend, which determines how and where Terraform stores its 
+    
+state data.
+    | -- main.tf - Contains the core resource definitions
+    | -- variables.tf - Declares input variables.
+    | -- terraform.tfvars - Assigns values to variables
+    | -- outputs.tf
+  
+    
+provider.tf: contains the Terraform block and provider block (AWS, Azure, etc)
+data.tf: contains all data sources
+variables.tf: contains all defined variables
+locals.tf: contains all local variables
+output.tf: contains all output resources.
+
+

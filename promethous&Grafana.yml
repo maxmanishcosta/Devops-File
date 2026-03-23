@@ -8,9 +8,9 @@ insights. Observability is crucial for maintaining the reliability and availabil
 
 It can be divided into three main components, namely:
 
-1. Monitor
-2. Logs
-3. Alerts
+1. Monitor (Metrics): Monitoring tells us what is happening.
+2. Logs: Logging explains why it is happening.
+3. Alerts Tracing(Traces): Tracing shows how it is happening.
 
 What is Grafana?
 ====================

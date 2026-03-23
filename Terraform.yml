@@ -60,7 +60,7 @@ TF will create infra, and these servers will be orchestrated/configured by Ansib
 Terraform Structure:
 -------------------
 
-Mainly, most of the people use 3 files in Terraform
+Mainly, most people use 3 files in Terraform
 
 main.tf: contains all providers, resources, and data sources
 variables.tf: contains all defined variables
@@ -75,9 +75,7 @@ Filenames do not matter to Terraform. To make it simple, we prefer the following
 projectname/
     | -- provider.tf Plugin to connect to Cloud, search in google, TF providers--> AWS--> Use provider
     | -- version.tf Sets required Terraform and provider versions.
-    | -- backend.tf this file is used to configure the backend, which determines how and where Terraform stores its 
-    
-state data.
+    | -- backend.tf this file is used to configure the backend, which determines how and where Terraform stores its state data.
     | -- main.tf - Contains the core resource definitions
     | -- variables.tf - Declares input variables.
     | -- terraform.tfvars - Assigns values to variables
